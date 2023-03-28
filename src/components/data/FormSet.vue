@@ -1,28 +1,19 @@
-<script setup>
-import { Input } from '@/assets/comp/Input.js'
-defineProps({
-  formProps: Object,
-  nameProps: String,
-  showProps: Boolean
-})
-</script>
-
 <template>
   <el-card v-show="show" style="width: calc(100% - 100px); margin: 20px 100px">
     <el-form-item label="表单组件">
-      <el-select v-model="form.itemType" placeholder="选择" style="width: 100%" @change="(val) => handleInsertFormItemTypeChange(val, form)">
+      <el-select v-model="formData.itemType" placeholder="选择" style="width: 100%" @change="(val) => handleInsertFormItemTypeChange(val, form)">
         <el-option-group v-for="group in formItemTypes" :key="group.value" :label="group.value">
           <el-option v-for="item in group.types" :key="item.value" :label="item.label" :value="item.value"> </el-option>
         </el-option-group>
       </el-select>
     </el-form-item>
-    <div v-show="form.itemType">
+    <div v-show="formData.itemType">
       <el-card>
         <div slot="header" class="clearfix">
           <span>Attributes</span>
         </div>
         <div>
-          <el-row v-for="(att, attIndex) in form.component.attributes" :key="attIndex">
+          <el-row v-for="(att, attIndex) in formData.component.attributes" :key="attIndex">
             <el-form-item :label="att.params" style="width: calc(100% - 50px); display: inline-block">
               <el-radio-group v-if="att.type === 'boolean' || (att.acceptedVals && att.acceptedVals.length > 0)" v-model="att.default">
                 <el-radio v-for="(item, index) in att.acceptedVals" :key="index" :label="item">{{ item }}</el-radio>
@@ -41,7 +32,7 @@ defineProps({
           <span>Events</span>
         </div>
         <div>
-          <el-row v-for="(eve, index) in form.component.events" :key="index">
+          <el-row v-for="(eve, index) in formData.component.events" :key="index">
             <el-form-item :label="eve.name" style="width: calc(100% - 100px); display: inline-block">
               <el-input v-model="eve.default" type="textarea" :autosize="{ minRows: 1, maxRows: 80 }"></el-input>
             </el-form-item>
@@ -56,25 +47,31 @@ defineProps({
   </el-card>
 </template>
 <script>
+import { Input } from '@/assets/comp/Input.js'
 export default {
+  props: {
+    form: Object,
+    name: String,
+    show: Boolean
+  },
   data() {
     return {
       formItemTypes: Input.formItemTypes(),
-      form: this.formProps,
-      show: this.showProps,
-      name: this.nameProps
+      formData: this.form
     }
   },
   methods: {
     handleInsertFormItemTypeChange(val, form) {
       switch (val) {
         case 'input':
-          this.form.component = new Input()
+          this.formData.component = new Input()
           break
         default:
       }
     },
     generMethod(eve) {
+      console.log(this.form)
+      console.log(this.formData)
       eve.default = eve.gener(this.name)
     }
   }
