@@ -4,7 +4,7 @@ import HelloWorld from './components/HelloWorld.vue'
 
 <template>
   <div id="app">
-    <el-row>
+    <el-row :gutter="20">
       <el-col :span="12">
         <div class="wrapper">
           <HelloWorld msg="You did it!" />

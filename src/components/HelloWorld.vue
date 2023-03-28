@@ -1,4 +1,5 @@
 <script setup>
+import DataSet from './data/DataSet.vue'
 defineProps({
   msg: {
     type: String,
@@ -8,7 +9,7 @@ defineProps({
 </script>
 
 <template>
-  <div class="greetings">You’ve successfully created a project with</div>
+  <data-set />
 </template>
 
 <style scoped></style>

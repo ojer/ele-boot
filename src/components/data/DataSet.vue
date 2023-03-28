@@ -1,68 +1,138 @@
 <script setup>
-const form = {
-  name: '',
-  region: '',
-  date1: '',
-  date2: '',
-  delivery: false,
-  type: [],
-  resource: '',
-  desc: ''
-}
-
-const formType = {
-  radioGroup: {
-    name: '单选框组'
+import { Input } from '@/assets/comp/Input.js'
+import FormSet from './FormSet.vue'
+const handleIsKeyChange = (val, par) => {
+  if (val) {
+    // par.showInsert = false
+    // par.showUpdate = false
+    // par.showTable = false
   }
 }
-const onSubmit = () => {
-  console.log('submit!')
+const handleShowInsertChange = (val, par) => {
+  if (val) {
+    console.log('insertShow')
+  }
+}
+const handleShowUpdateChange = (val, par) => {
+  if (!val) {
+    return
+  }
+  if (!par.updateForm.itemType && par.showInsert && par.insertForm.itemType) {
+    const obj = JSON.stringify(par.insertForm)
+    par.updateForm = JSON.parse(obj)
+  }
+}
+
+const handleInsertFormItemTypeChange = (val, form) => {
+  switch (val) {
+    case 'input':
+      form.component = new Input()
+      break
+    default:
+  }
+}
+
+const handleUpdateFormItemTypeChange = (val, form) => {
+  handleInsertFormItemTypeChange(val, form)
 }
 </script>
 <template>
   <div>
-    <el-form ref="form" :model="form" label-width="80px">
-      <el-card class="box-card">
-        <div slot="header" class="clearfix">
-          <span>卡片名称</span>
-          <el-button style="float: right; padding: 3px 0" type="text">x</el-button>
-        </div>
-        <div>
-          <el-form-item label="参数名称">
-            <el-input v-model="form.paramsName"></el-input>
-          </el-form-item>
-          <el-form-item label="表单类型">
-            <el-select v-model="form.region" placeholder="请选择活动区域">
-              <el-option label="区域一" value="shanghai"> </el-option>
-              <el-option label="区域二" value="beijing"> </el-option>
-            </el-select>
-          </el-form-item>
-        </div>
-      </el-card>
-      <el-form-item label="即时配送">
-        <el-switch v-model="form.delivery"> </el-switch>
-      </el-form-item>
-      <el-form-item label="活动性质">
-        <el-checkbox-group v-model="form.type">
-          <el-checkbox label="美食/餐厅线上活动" name="type"> </el-checkbox>
-          <el-checkbox label="地推活动" name="type"> </el-checkbox>
-          <el-checkbox label="线下主题活动" name="type"> </el-checkbox>
-          <el-checkbox label="单纯品牌曝光" name="type"> </el-checkbox>
-        </el-checkbox-group>
-      </el-form-item>
-      <el-form-item label="特殊资源">
-        <el-radio-group v-model="form.resource">
-          <el-radio label="线上品牌商赞助"> </el-radio>
-          <el-radio label="线下场地免费"> </el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="活动形式">
-        <el-input type="textarea" v-model="form.desc"> </el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="onSubmit"> 立即创建</el-button>
-        <el-button> 取消</el-button>
-      </el-form-item>
+    <el-form ref="form" :model="form" size="mini" label-width="150px">
+      <div v-for="(p, pi) in form.params" :key="pi">
+        <el-card>
+          <div slot="header" class="clearfix">
+            <span>{{ p.title }} {{ p.name }}</span>
+            <el-button style="float: right; padding: 3px 0" type="text">x</el-button>
+          </div>
+          <div>
+            <el-form-item label="Title">
+              <el-input v-model="p.title"></el-input>
+            </el-form-item>
+
+            <el-form-item label="name">
+              <el-input v-model="p.name"></el-input>
+            </el-form-item>
+
+            <el-form-item label="主键">
+              <el-switch v-model="p.isKey" @change="(val) => handleIsKeyChange(val, p)"> </el-switch>
+            </el-form-item>
+
+            <el-form-item label="新增时可编辑">
+              <el-switch v-model="p.showInsert" @change="(val) => handleShowInsertChange(val, p)"> </el-switch>
+            </el-form-item>
+            <template>
+              <form-set :showProps="p.showInsert" :formProps="p.insertForm" :nameProps="p.name" />
+            </template>
+
+            <el-form-item label="修改时可编辑">
+              <el-switch v-model="p.showUpdate" @change="(val) => handleShowUpdateChange(val, p)"> </el-switch>
+            </el-form-item>
+
+            <el-card v-show="p.showUpdate" style="width: calc(100% - 100px); margin: 20px 100px">
+              <el-form-item label="表单组件">
+                <el-select v-model="p.updateForm.itemType" placeholder="选择" style="width: 100%" @change="(val) => handleUpdateFormItemTypeChange(val, p.updateForm)">
+                  <el-option-group v-for="group in formItemTypes" :key="group.value" :label="group.value">
+                    <el-option v-for="item in group.types" :key="item.value" :label="item.label" :value="item.value"> </el-option>
+                  </el-option-group>
+                </el-select>
+              </el-form-item>
+              <el-row v-for="(att, attIndex) in p.updateForm.component.attributes" :key="attIndex">
+                <el-form-item :label="att.params" style="width: calc(100% - 50px); display: inline-block">
+                  <el-radio-group v-if="att.type === 'boolean' || (att.acceptedVals && att.acceptedVals.length > 0)" v-model="att.default">
+                    <el-radio v-for="(item, index) in att.acceptedVals" :key="index" :label="item">{{ item }}</el-radio>
+                  </el-radio-group>
+                  <el-input v-else v-model="att.default"></el-input>
+                </el-form-item>
+                <!--<el-col :span="4" style="text-align: right">-->
+                <el-popover placement="right" title="说明" width="500" trigger="click" :content="att.description">
+                  <el-button type="text" slot="reference" icon="el-icon-info" size="mini" style="width: 50px" circle></el-button>
+                </el-popover>
+              </el-row>
+            </el-card>
+
+            <el-form-item label="Table 显示列">
+              <el-switch v-model="p.showTable" @change="(val) => handleIsKeyChange(val, p)"> </el-switch>
+            </el-form-item>
+          </div>
+        </el-card>
+      </div>
     </el-form>
   </div>
 </template>
+<script>
+export default {
+  data() {
+    return {
+      formItemTypes: Input.formItemTypes(),
+      form: {
+        name: '',
+        params: [
+          {
+            name: undefined,
+            title: undefined,
+            isKey: false,
+            showInsert: true,
+            showUpdate: true,
+            showTable: true,
+            insertForm: {
+              itemType: undefined,
+              component: {
+                attributes: [],
+                events: {}
+              }
+            },
+            updateForm: {
+              itemType: undefined,
+              component: {
+                attributes: [],
+                events: {}
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
+</script>
