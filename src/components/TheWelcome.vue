@@ -1,6 +1,6 @@
 <script setup>
 import DataSet from './data/DataSet.vue'
-// import DocumentationIcon from './icons/IconDocumentation.vue'
+import FormView from './form/FormView.vue'
 // import ToolingIcon from './icons/IconTooling.vue'
 // import EcosystemIcon from './icons/IconEcosystem.vue'
 // import CommunityIcon from './icons/IconCommunity.vue'
@@ -19,7 +19,9 @@ const handClick = (val) => {
         <data-set />
       </el-tab-pane>
       <el-tab-pane label="List" name="list">list</el-tab-pane>
-      <el-tab-pane label="Insert" name="insert">list</el-tab-pane>
+      <el-tab-pane label="Insert" name="insert">
+        <form-view />
+      </el-tab-pane>
       <el-tab-pane label="Update" name="updateForm">list</el-tab-pane>
     </el-tabs>
   </div>
