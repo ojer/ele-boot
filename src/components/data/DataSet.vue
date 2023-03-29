@@ -7,48 +7,53 @@
           <el-button style="float: right; padding: 3px 0" type="text">x</el-button>
         </div>
         <div>
-          <el-form-item label="Title">
-            <el-input v-model="p.title"></el-input>
-          </el-form-item>
-
-          <el-form-item label="name">
-            <el-input v-model="p.name"></el-input>
-          </el-form-item>
-
-          <el-form-item label="主键">
-            <el-switch v-model="p.isKey" @change="(val) => handleIsKeyChange(val, p)"> </el-switch>
-          </el-form-item>
-
-          <el-form-item label="新增时可编辑">
-            <el-switch v-model="p.showInsert" @change="(val) => handleShowInsertChange(val, p)"> </el-switch>
-          </el-form-item>
           <template>
+            <el-form-item label="Title">
+              <el-input v-model="p.title"></el-input>
+            </el-form-item>
+            <el-form-item label="name">
+              <el-input v-model="p.name"></el-input>
+            </el-form-item>
+            <el-form-item label="主键">
+              <el-switch v-model="p.isKey" :disabled="!p.name" @change="(val) => handleIsKeyChange(val, p)"> </el-switch>
+            </el-form-item>
+          </template>
+
+          <template>
+            <el-form-item label="新增时可编辑">
+              <el-switch v-model="p.showInsert" :disabled="!p.name" @change="(val) => handleShowInsertChange(val, p)"> </el-switch>
+            </el-form-item>
             <form-set :show="p.showInsert" :form.sync="p.insertForm" :name="p.name" />
           </template>
 
-          <el-form-item label="修改时可编辑">
-            <el-switch v-model="p.showUpdate" @change="(val) => handleShowUpdateChange(val, p)"> </el-switch>
-          </el-form-item>
-
           <template>
+            <el-form-item label="修改时可编辑">
+              <el-switch v-model="p.showUpdate" :disabled="!p.name" @change="(val) => handleShowUpdateChange(val, p)"> </el-switch>
+            </el-form-item>
             <form-set :show="p.showUpdate" :form.sync="p.updateForm" :name="p.name" />
           </template>
 
-          <el-form-item label="Table 显示列">
-            <el-switch v-model="p.showTable" @change="(val) => handleIsKeyChange(val, p)"> </el-switch>
-          </el-form-item>
+          <template>
+            <el-form-item label="Table 显示列">
+              <el-switch v-model="p.showTable" :disabled="!p.name" @change="(val) => handleShowTableChange(val, p)"> </el-switch>
+            </el-form-item>
+            <table-set :show="p.showTable" :table.sync="p.listTable" />
+          </template>
         </div>
       </el-card>
     </div>
+    <el-button @click="gener"> O K </el-button>
   </el-form>
 </template>
 
 <script>
 import { Input } from '@/assets/comp/Input.js'
 import FormSet from './FormSet.vue'
+import TableSet from './TableSet.vue'
 export default {
   components: {
-    FormSet
+    FormSet,
+    TableSet
   },
   data() {
     return {
@@ -69,7 +74,7 @@ export default {
                 label: undefined,
                 name: undefined,
                 attributes: [],
-                events: {}
+                events: []
               }
             },
             updateForm: {
@@ -78,7 +83,15 @@ export default {
                 label: undefined,
                 name: undefined,
                 attributes: [],
-                events: {}
+                events: []
+              }
+            },
+            listTable: {
+              itemType: undefined,
+              component: {
+                label: undefined,
+                name: undefined,
+                attributes: []
               }
             }
           }
@@ -87,18 +100,8 @@ export default {
     }
   },
   methods: {
-    handleIsKeyChange(val, par) {
-      if (val) {
-        // par.showInsert = false
-        // par.showUpdate = false
-        // par.showTable = false
-      }
-    },
-    handleShowInsertChange(val, par) {
-      if (val) {
-        console.log('insertShow')
-      }
-    },
+    handleIsKeyChange(val, par) {},
+    handleShowInsertChange(val, par) {},
     handleShowUpdateChange(val, par) {
       if (!val) {
         return
@@ -110,6 +113,7 @@ export default {
           itemType,
           component: { label, name, attributes, events }
         } = JSON.parse(obj)
+        console.log(obj)
         par.updateForm.itemType = itemType
         par.updateForm.component.label = label
         par.updateForm.component.name = name
@@ -117,18 +121,9 @@ export default {
         par.updateForm.component.events = events
       }
     },
-
-    handleInsertFormItemTypeChange(val, form) {
-      switch (val) {
-        case 'input':
-          form.component = new Input()
-          break
-        default:
-      }
-    },
-
-    handleUpdateFormItemTypeChange(val, form) {
-      this.handleInsertFormItemTypeChange(val, form)
+    handleShowTableChange(val, par) {},
+    gener() {
+      console.log(this.form)
     }
   }
 }

@@ -1,5 +1,27 @@
 export const BaseComponent = class {
-  constructor(name, label, attributes, events) {
+  constructor(name, label, elModule, events) {
+    const attributes = []
+    const ps = elModule.props
+    for (const key in ps) {
+      const po = ps[key]
+      let type
+      if (po.type) {
+        type = po.type.name
+      } else {
+        type = undefined
+      }
+      let defaultVal = po.default
+      if (defaultVal !== undefined && type !== 'Boolean') {
+        defaultVal = defaultVal.toString()
+      }
+      attributes.push({
+        params: key,
+        description: '?',
+        type: type,
+        default: defaultVal
+      })
+    }
+
     this.name = name
     this.label = label
     this.attributes = attributes
