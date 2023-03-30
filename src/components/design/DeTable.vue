@@ -13,7 +13,6 @@
   </el-card>
 </template>
 <script>
-import { TableColumn } from '@/assets/comp/TableColumn.js'
 export default {
   props: {
     table: Object,
@@ -25,7 +24,7 @@ export default {
     }
   },
   mounted() {
-    this.tableData.component = new TableColumn()
+    //    this.tableData.component = new TableColumn()
   }
 }
 </script>

@@ -1,10 +1,8 @@
 <template>
   <el-card v-show="show" style="width: calc(100% - 100px); margin: 20px 100px">
     <el-form-item label="表单组件">
-      <el-select v-model="formData.itemType" placeholder="选择" style="width: 100%" @change="(val) => handleInsertFormItemTypeChange(val, form)">
-        <el-option-group v-for="group in formItemTypes" :key="group.value" :label="group.value">
-          <el-option v-for="item in group.types" :key="item.value" :label="item.label" :value="item.value"> </el-option>
-        </el-option-group>
+      <el-select v-model="formData.itemType" placeholder="选择" style="width: 100%" @change="(val) => handleInsertFormItemTypeChange(val)">
+        <el-option v-for="item in formItemTypes" :key="item.value" :label="item.name" :value="item.value"> </el-option>
       </el-select>
     </el-form-item>
     <div v-show="formData.itemType">
@@ -14,15 +12,15 @@
       <!--</div>-->
       <div>
         <el-row v-for="(att, attIndex) in formData.component.attributes" :key="attIndex">
-          <el-form-item :label="att.params" style="width: calc(100% - 50px); display: inline-block">
+          <el-form-item :label="att.name" style="width: calc(100% - 0px); display: inline-block">
             <el-radio-group v-if="att.type === 'Boolean'" v-model="att.default">
               <el-radio v-for="(item, index) in [false, true]" :key="index" :label="item">{{ item }}</el-radio>
             </el-radio-group>
             <el-input v-else v-model="att.default"></el-input>
           </el-form-item>
-          <el-popover placement="right" title="说明" width="500" trigger="click" :content="att.description">
-            <el-button type="text" slot="reference" icon="el-icon-info" size="mini" style="width: 50px" circle></el-button>
-          </el-popover>
+          <!--<el-popover placement="right" title="说明" width="500" trigger="click" :content="att.description">-->
+          <!--<el-button type="text" slot="reference" icon="el-icon-info" size="mini" style="width: 50px" circle></el-button>-->
+          <!--</el-popover>-->
         </el-row>
       </div>
       <!--</el-card>-->
@@ -46,7 +44,7 @@
   </el-card>
 </template>
 <script>
-import { Input } from '@/assets/comp/Input.js'
+import { eleFormComponent, ElComponent } from '@/assets/ElComponent.js'
 export default {
   props: {
     form: Object,
@@ -55,18 +53,13 @@ export default {
   },
   data() {
     return {
-      formItemTypes: Input.formItemTypes(),
+      formItemTypes: eleFormComponent,
       formData: this.form
     }
   },
   methods: {
-    handleInsertFormItemTypeChange(val, form) {
-      switch (val) {
-        case 'input':
-          this.formData.component = new Input()
-          break
-        default:
-      }
+    handleInsertFormItemTypeChange(val) {
+      this.formData.component = new ElComponent(val)
     },
     generMethod(eve) {
       eve.default = eve.gener(this.name)

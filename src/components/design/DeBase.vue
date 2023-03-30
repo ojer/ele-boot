@@ -1,3 +1,8 @@
+<script setup>
+import DeForm from './DeForm.vue'
+import DeTable from './DeTable.vue'
+</script>
+
 <template>
   <el-form ref="form" :model="form" size="mini" label-width="150px">
     <div v-for="(p, pi) in form.params" :key="pi">
@@ -23,21 +28,21 @@
             <el-form-item label="新增时可编辑">
               <el-switch v-model="p.showInsert" :disabled="!p.name" @change="(val) => handleShowInsertChange(val, p)"> </el-switch>
             </el-form-item>
-            <form-set :show="p.showInsert" :form.sync="p.insertForm" :name="p.name" />
+            <de-form :show="p.showInsert" :form.sync="p.insertForm" :name="p.name" />
           </template>
 
           <template>
             <el-form-item label="修改时可编辑">
               <el-switch v-model="p.showUpdate" :disabled="!p.name" @change="(val) => handleShowUpdateChange(val, p)"> </el-switch>
             </el-form-item>
-            <form-set :show="p.showUpdate" :form.sync="p.updateForm" :name="p.name" />
+            <de-form :show="p.showUpdate" :form.sync="p.updateForm" :name="p.name" />
           </template>
 
           <template>
             <el-form-item label="Table 显示列">
               <el-switch v-model="p.showTable" :disabled="!p.name" @change="(val) => handleShowTableChange(val, p)"> </el-switch>
             </el-form-item>
-            <table-set :show="p.showTable" :table.sync="p.listTable" />
+            <de-table :show="p.showTable" :table.sync="p.listTable" />
           </template>
         </div>
       </el-card>
@@ -47,17 +52,9 @@
 </template>
 
 <script>
-import { Input } from '@/assets/comp/Input.js'
-import FormSet from './FormSet.vue'
-import TableSet from './TableSet.vue'
 export default {
-  components: {
-    FormSet,
-    TableSet
-  },
   data() {
     return {
-      formItemTypes: Input.formItemTypes(),
       form: {
         name: '',
         params: [
@@ -113,7 +110,6 @@ export default {
           itemType,
           component: { label, name, attributes, events }
         } = JSON.parse(obj)
-        console.log(obj)
         par.updateForm.itemType = itemType
         par.updateForm.component.label = label
         par.updateForm.component.name = name
@@ -123,7 +119,7 @@ export default {
     },
     handleShowTableChange(val, par) {},
     gener() {
-      console.log(this.form)
+      this.$emit('gener', this.form)
     }
   }
 }
