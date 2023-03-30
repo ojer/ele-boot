@@ -1,5 +1,5 @@
 <script setup>
-import DeForm from './DeForm.vue'
+import DeFormElement from './DeFormElement.vue'
 import DeTable from './DeTable.vue'
 </script>
 
@@ -28,14 +28,14 @@ import DeTable from './DeTable.vue'
             <el-form-item label="新增时可编辑">
               <el-switch v-model="p.showInsert" :disabled="!p.name" @change="(val) => handleShowInsertChange(val, p)"> </el-switch>
             </el-form-item>
-            <de-form :show="p.showInsert" :form.sync="p.insertForm" :name="p.name" />
+            <de-form-element v-show="p.showInsert" :form.sync="p.insertForm" :name="p.name" />
           </template>
 
           <template>
             <el-form-item label="修改时可编辑">
               <el-switch v-model="p.showUpdate" :disabled="!p.name" @change="(val) => handleShowUpdateChange(val, p)"> </el-switch>
             </el-form-item>
-            <de-form :show="p.showUpdate" :form.sync="p.updateForm" :name="p.name" />
+            <de-form-element v-show="p.showUpdate" :form.sync="p.updateForm" :name="p.name" />
           </template>
 
           <template>
