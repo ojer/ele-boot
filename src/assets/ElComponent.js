@@ -47,8 +47,9 @@ export const ElComponent = class {
       attributes.push({
         name: key,
         type: type,
+        default: defaultVal,
+        value: defaultVal
         // description: '?',
-        default: defaultVal
       })
     }
 

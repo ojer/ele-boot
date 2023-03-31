@@ -1,104 +1,223 @@
 <script setup>
-import DeFormElement from './DeFormElement.vue'
+import DeForm from './DeForm.vue'
 import DeTable from './DeTable.vue'
+import DeFormItem from './DeFormItem.vue'
+import DeFormElement from './DeFormElement.vue'
+import ResultPreview from '@/components/ResultPreview.vue'
 </script>
-
 <template>
-  <el-form ref="form" :model="form" size="mini" label-width="150px">
-    <div v-for="(p, pi) in form.params" :key="pi">
-      <el-card>
-        <div slot="header" class="clearfix">
-          <span>{{ p.title }} {{ p.name }}</span>
-          <el-button style="float: right; padding: 3px 0" type="text">x</el-button>
-        </div>
-        <div>
-          <template>
-            <el-form-item label="Title">
-              <el-input v-model="p.title"></el-input>
-            </el-form-item>
-            <el-form-item label="name">
-              <el-input v-model="p.name"></el-input>
-            </el-form-item>
-            <el-form-item label="主键">
-              <el-switch v-model="p.isKey" :disabled="!p.name" @change="(val) => handleIsKeyChange(val, p)"> </el-switch>
-            </el-form-item>
-          </template>
+  <div>
+    <el-row style="margin: auto 5px">
+      <el-slider v-model="width" :step="1" :min="0" :max="24" :show-tooltip="false"></el-slider>
+    </el-row>
+    <el-row :gutter="10">
+      <el-col :span="width">
+        <el-card>
+          <div slot="header" class="clearfix">
+            <span>design</span>
+          </div>
+          <el-form ref="design" :model="design" size="mini" label-width="150px">
+            <el-collapse>
+              <el-collapse-item name="100">
+                <template slot="title">
+                  <span style="color: #409eff">新增表单选项</span>
+                </template>
+                <de-form :form.sync="design.tagForm.insert" />
+              </el-collapse-item>
+              <el-collapse-item name="101">
+                <template slot="title">
+                  <span style="color: #409eff">修改表单选项</span>
+                </template>
+                <de-form :form.sync="design.tagForm.update" />
+              </el-collapse-item>
+              <el-collapse-item name="103">
+                <template slot="title">
+                  <span style="color: #409eff">表格选项</span>
+                </template>
+                <de-table :table.sync="design.tagTable" />
+              </el-collapse-item>
 
-          <template>
-            <el-form-item label="新增时可编辑">
-              <el-switch v-model="p.showInsert" :disabled="!p.name" @change="(val) => handleShowInsertChange(val, p)"> </el-switch>
-            </el-form-item>
-            <de-form-element v-show="p.showInsert" :form.sync="p.insertForm" :name="p.name" />
-          </template>
+              <el-collapse-item name="200">
+                <template slot="title">
+                  <span style="color: #409eff">参数列表</span>
+                </template>
+                <el-collapse>
+                  <div v-for="(p, pi) in design.params" :key="pi">
+                    <el-collapse-item :name="pi">
+                      <template slot="title">
+                        {{ pi + 1 }}
+                        <span style="color: #409eff; margin: auto 20px"> {{ p.title ? p.title + ' : ' + p.name : '未设置' }} </span>
+                      </template>
+                      <el-card>
+                        <div>
+                          <template>
+                            <el-form-item label="Title">
+                              <el-input v-model="p.title"></el-input>
+                            </el-form-item>
+                            <el-form-item label="name">
+                              <el-input v-model="p.name"></el-input>
+                            </el-form-item>
+                            <el-form-item label="主键">
+                              <el-switch v-model="p.isKey" :disabled="!p.name" @change="(val) => handleIsKeyChange(val, p)"> </el-switch>
+                            </el-form-item>
+                          </template>
+                          <el-divider content-position="left">新增时</el-divider>
+                          <template>
+                            <el-form-item label="新增时显示">
+                              <el-switch v-model="p.insertForm.show" :disabled="!p.name || !p.title" @change="(val) => handleShowInsertChange(val, p)"> </el-switch>
+                            </el-form-item>
+                            <el-collapse v-if="p.insertForm.show" style="width: calc(100% - 150px); margin-left: 150px">
+                              <el-collapse-item name="0">
+                                <template slot="title">
+                                  <span style="color: #409eff">表单项目</span>
+                                </template>
+                                <de-form-item :formItem.sync="p.insertForm.tagFormItem" :name="p.name" :title="p.title" />
+                              </el-collapse-item>
+                              <el-collapse-item name="1">
+                                <template slot="title">
+                                  <span style="color: #409eff">元素</span>
+                                </template>
+                                <de-form-element :insertForm.sync="p.insertForm" :name="p.name" />
+                              </el-collapse-item>
+                            </el-collapse>
+                          </template>
 
-          <template>
-            <el-form-item label="修改时可编辑">
-              <el-switch v-model="p.showUpdate" :disabled="!p.name" @change="(val) => handleShowUpdateChange(val, p)"> </el-switch>
-            </el-form-item>
-            <de-form-element v-show="p.showUpdate" :form.sync="p.updateForm" :name="p.name" />
-          </template>
+                          <el-divider content-position="left">修改时</el-divider>
+                          <template>
+                            <el-form-item label="修改时可编辑">
+                              <el-switch v-model="p.updateForm.show" :disabled="!p.name || !p.title" @change="(val) => handleShowUpdateChange(val, p)"> </el-switch>
+                            </el-form-item>
 
-          <template>
-            <el-form-item label="Table 显示列">
-              <el-switch v-model="p.showTable" :disabled="!p.name" @change="(val) => handleShowTableChange(val, p)"> </el-switch>
-            </el-form-item>
-            <de-table :show="p.showTable" :table.sync="p.listTable" />
-          </template>
-        </div>
-      </el-card>
-    </div>
-    <el-button @click="gener"> O K </el-button>
-  </el-form>
+                            <el-collapse v-if="p.updateForm.show" style="width: calc(100% - 150px); margin-left: 150px">
+                              <el-collapse-item name="0">
+                                <template slot="title">
+                                  <span style="color: #409eff">表单项目</span>
+                                </template>
+                                <de-form-item :formItem.sync="p.updateForm.tagFormItem" :name="p.name" :title="p.title" />
+                              </el-collapse-item>
+                              <el-collapse-item name="1">
+                                <template slot="title">
+                                  <span style="color: #409eff">元素</span>
+                                </template>
+                                <de-form-element :insertForm.sync="p.updateForm" :name="p.name" />
+                              </el-collapse-item>
+                            </el-collapse>
+                          </template>
+
+                          <el-divider content-position="left">列表表格</el-divider>
+                          <template>
+                            <el-form-item label="Table 显示列">
+                              <el-switch v-model="p.table.show" :disabled="!p.name || !p.title" @change="(val) => handleShowTableChange(val, p)"> </el-switch>
+                            </el-form-item>
+                            <el-collapse v-if="p.table.show" style="width: calc(100% - 150px); margin-left: 150px">
+                              <el-collapse-item name="0">
+                                <template slot="title">
+                                  <span style="color: #409eff">表格列</span>
+                                </template>
+                                <de-table :column.sync="p.table.tagTableColumn" />
+                              </el-collapse-item>
+                            </el-collapse>
+                          </template>
+                        </div>
+                      </el-card>
+                    </el-collapse-item>
+                  </div>
+                </el-collapse>
+              </el-collapse-item>
+            </el-collapse>
+          </el-form>
+        </el-card>
+      </el-col>
+      <el-col :span="24 - width">
+        <result-preview :entity="design" />
+      </el-col>
+    </el-row>
+  </div>
 </template>
 
 <script>
 export default {
   data() {
     return {
-      form: {
+      design: {
         name: '',
+        tagForm: {
+          insert: {
+            name: undefined,
+            label: undefined,
+            attributes: [],
+            events: []
+          },
+          update: {
+            name: undefined,
+            label: undefined,
+            attributes: [],
+            events: []
+          }
+        },
+        tagTable: {
+          name: undefined,
+          label: undefined,
+          attributes: [],
+          events: []
+        },
         params: [
           {
             name: undefined,
             title: undefined,
             isKey: false,
-            showInsert: false,
-            showUpdate: false,
-            showTable: false,
             insertForm: {
+              show: false,
               itemType: undefined,
-              component: {
-                label: undefined,
+              tagFormItem: {
                 name: undefined,
+                label: undefined,
+                attributes: [],
+                events: []
+              },
+              tagElement: {
+                name: undefined,
+                label: undefined,
                 attributes: [],
                 events: []
               }
             },
             updateForm: {
+              show: false,
               itemType: undefined,
-              component: {
-                label: undefined,
+              tagFormItem: {
                 name: undefined,
+                label: undefined,
+                attributes: [],
+                events: []
+              },
+              tagElement: {
+                name: undefined,
+                label: undefined,
                 attributes: [],
                 events: []
               }
             },
-            listTable: {
-              itemType: undefined,
-              component: {
-                label: undefined,
+            table: {
+              show: false,
+              tagTableColumn: {
                 name: undefined,
-                attributes: []
+                label: undefined,
+                attributes: [],
+                events: []
               }
             }
           }
         ]
-      }
+      },
+      width: 12
     }
   },
   methods: {
     handleIsKeyChange(val, par) {},
-    handleShowInsertChange(val, par) {},
+    handleShowInsertChange(val, par) {
+      console.debug(this.design)
+    },
     handleShowUpdateChange(val, par) {
       if (!val) {
         return
@@ -117,10 +236,7 @@ export default {
         par.updateForm.component.events = events
       }
     },
-    handleShowTableChange(val, par) {},
-    gener() {
-      this.$emit('gener', this.form)
-    }
+    handleShowTableChange(val, par) {}
   }
 }
 </script>

@@ -1,7 +1,7 @@
 <script>
 export default {
   props: {
-    genData: Array,
+    genData: Object,
     limit: Number
   },
   template: '<div>null</div>',
@@ -20,35 +20,77 @@ export default {
       return propertyName.replace(/[A-Z]/g, (match) => {
         return '-' + match.toLowerCase()
       })
+    },
+    // TODO
+    setDataPar(obj, key) {
+      var ks = key.split('.')
+      var o = obj
+      const kl = ks.length
+      for (let i = 0; i < kl; i++) {
+        var k = ks[i]
+        var fo = o[k]
+        if (fo === undefined) {
+          if (i < kl - 1) {
+            o[k] = {}
+          } else {
+            o[k] = undefined
+          }
+        }
+        o = o[k]
+      }
+    },
+    setAttributes(attributes, str) {
+      attributes.forEach(({ name, type, value, default: defVal }) => {
+        if (value !== undefined && defVal !== value) {
+          str += ` `
+          if (type === 'String') {
+            str += `${name}="${value}"`
+          } else {
+            var o = JSON.parse(JSON.stringify(this._data))
+            this.setDataPar(o, value)
+            Object.assign(this._data, o)
+            str += `:${name}="${value}"`
+          }
+        }
+      })
+      return str
     }
   },
   mounted() {
     //    console.log(this)
   },
   created() {
-    console.debug('pre-insert', this.genData)
-    let str = '<div></div>'
-    if (this.genData && this.genData.length > 0) {
-      str = '<el-card>' + '<el-form ref="dynamicValidateForm" :model="form" label-position="top" size="mini">'
-      // :rules="">
-      this.genData.forEach((item) => {
-        const tag = this.styleHyphenFormat(item.itemType)
-        str += `<el-form-item label="${item.title}" prop="${item.name}">`
-        str += `<el${tag} v-model="form.${item.name}"`
-        item.attributes.forEach((att) => {
-          if (att.default !== undefined) {
-            str += ' '
-            str += `${att.type === 'String' ? '' : ':'}${att.name}="${att.default}"`
-          }
-        })
+    console.log('genData', this.genData)
+    if (!this.genData.params || this.genData.params.length === 0) {
+      return
+    }
+    let str = '<el-card>'
+    str += '<el-form ref="dynamicValidateForm" :model="form"'
+    // <el-form>
+    const tagForm = this.genData.tagForm
+    str = this.setAttributes(tagForm.insert.attributes, str)
+    str += '>'
+
+    // :rules="">
+    this.genData.params.forEach(({ insertForm: { itemType, show, tagElement, tagFormItem }, name, title }) => {
+      if (show) {
+        // form-item
+        str += `<el-form-item label="${title}" prop="${name}"`
+        str = this.setAttributes(tagFormItem.attributes, str)
+        str += `>`
+        // el-xxx
+        const tag = this.styleHyphenFormat(itemType)
+        str += `<el${tag} v-model="form.${name}"`
+        str = this.setAttributes(tagElement.attributes, str)
         str += `></el${tag}>`
         str += `</el-form-item>`
-      })
-      str += `<el-button size="mini" @click="handleInsertFormHide('dynamicValidateForm')">取 消</el-button>`
-      str += `<el-button type="primary" size="mini" @click="handleFormSubmit('dynamicValidateForm')">确 定</el-button>`
-      str += `</el-form>`
-      str += `</el-card>`
-    }
+      }
+    })
+    str += `<el-button size="mini" @click="handleInsertFormHide('dynamicValidateForm')">取 消</el-button>`
+    str += `<el-button type="primary" size="mini" @click="handleFormSubmit('dynamicValidateForm')">确 定</el-button>`
+    str += `</el-form>`
+    str += `</el-card>`
+    console.log(str)
     this.$options.template = str
   }
 }
