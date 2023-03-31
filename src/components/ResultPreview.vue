@@ -7,7 +7,7 @@ import PreInsertForm from './preview/PreInsertForm.vue'
 </script>
 
 <template>
-  <el-card>
+  <el-card style="min-height: 90vh">
     <div slot="header" class="clearfix">
       <span>preview</span>
       <el-button style="float: right; padding: 3px 0" type="text" @click="gener">刷新</el-button>

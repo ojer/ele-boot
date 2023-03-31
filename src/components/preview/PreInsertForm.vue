@@ -11,61 +11,15 @@ export default {
       form: {}
     }
   },
-  methods: {
-    handleInsertFormHide() {},
-    handleFormSubmit() {
-      console.log(this.form)
-    },
-    styleHyphenFormat(propertyName) {
-      return propertyName.replace(/[A-Z]/g, (match) => {
-        return '-' + match.toLowerCase()
-      })
-    },
-    // TODO
-    setDataPar(obj, key) {
-      var ks = key.split('.')
-      var o = obj
-      const kl = ks.length
-      for (let i = 0; i < kl; i++) {
-        var k = ks[i]
-        var fo = o[k]
-        if (fo === undefined) {
-          if (i < kl - 1) {
-            o[k] = {}
-          } else {
-            o[k] = undefined
-          }
-        }
-        o = o[k]
-      }
-    },
-    setAttributes(attributes, str) {
-      attributes.forEach(({ name, type, value, default: defVal }) => {
-        if (value !== undefined && defVal !== value) {
-          str += ` `
-          if (type === 'String') {
-            str += `${name}="${value}"`
-          } else {
-            var o = JSON.parse(JSON.stringify(this._data))
-            this.setDataPar(o, value)
-            Object.assign(this._data, o)
-            str += `:${name}="${value}"`
-          }
-        }
-      })
-      return str
-    }
-  },
-  mounted() {
-    //    console.log(this)
-  },
+  mounted() {},
   created() {
     console.log('genData', this.genData)
     if (!this.genData.params || this.genData.params.length === 0) {
       return
     }
     let str = '<el-card>'
-    str += '<el-form ref="dynamicValidateForm" :model="form"'
+    // :model="form"
+    str += '<el-form ref="dynamicValidateForm" '
     // <el-form>
     const tagForm = this.genData.tagForm
     str = this.setAttributes(tagForm.insert.attributes, str)
@@ -92,6 +46,68 @@ export default {
     str += `</el-card>`
     console.log(str)
     this.$options.template = str
+  },
+
+  methods: {
+    handleInsertFormHide() {},
+    handleFormSubmit() {
+      console.log(this.form)
+    },
+    styleHyphenFormat(propertyName) {
+      return propertyName.replace(/[A-Z]/g, (match) => {
+        return '-' + match.toLowerCase()
+      })
+    },
+    // TODO
+    setDataPar(obj, key) {
+      console.log('setD', key)
+      var ks = key.split('.')
+      var o = obj
+      const kl = ks.length
+      for (let i = 0; i < kl; i++) {
+        var k = ks[i]
+        var fo = o[k]
+        if (fo === undefined) {
+          if (i < kl - 1) {
+            o[k] = {}
+          } else {
+            o[k] = undefined
+          }
+        }
+        o = o[k]
+      }
+    },
+    setAttributes(attributes, str) {
+      attributes.forEach(({ name, type, value, default: defVal }) => {
+        if (value !== undefined && defVal !== value) {
+          str += ` `
+          switch (type) {
+            case 'Object':
+            case 'Array':
+              var o = JSON.parse(JSON.stringify(this.$data))
+              this.setDataPar(o, value)
+              for (const k in o) {
+                this.$data[k] = o[k]
+              }
+              // Object.assign(this.$data, o)
+              str += `:${name}="$data.${value}"`
+              break
+            case 'String':
+              str += `:${name}="'${value}'"`
+              break
+            case 'Boolean':
+              str += `:${name}="${value}"`
+              break
+            case 'Number':
+              str += `:${name}="${value}"`
+              break
+            default:
+              str += `:${name}="${value}"`
+          }
+        }
+      })
+      return str
+    }
   }
 }
 </script>

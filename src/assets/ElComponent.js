@@ -23,6 +23,7 @@ export const eleFormComponent = [
 export const eleTable = { name: 'Table 表格', value: 'Table' }
 export const eleTableColumn = { name: 'TableColumn 表格列', value: 'TableColumn' }
 
+console.log(ElementUI)
 export const ElComponent = class {
   constructor(val) {
     const component = ElementUI[val]
