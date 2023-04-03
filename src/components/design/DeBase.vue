@@ -3,6 +3,7 @@ import DeForm from './DeForm.vue'
 import DeTable from './DeTable.vue'
 import DeFormItem from './DeFormItem.vue'
 import DeFormElement from './DeFormElement.vue'
+import DeTableColumn from './DeTableColumn.vue'
 import ResultPreview from '@/components/ResultPreview.vue'
 </script>
 <template>
@@ -25,33 +26,36 @@ import ResultPreview from '@/components/ResultPreview.vue'
                   <el-collapse>
                     <el-collapse-item name="100">
                       <template slot="title">
-                        <span style="color: #409eff">新增表单选项</span>
+                        <span style="color: #409eff">组件配置</span>
                       </template>
-                      <de-form :form.sync="design.tagForm.insert" />
+                      <el-tabs value="a">
+                        <el-tab-pane label="新增表单选项" name="a">
+                          <de-form :form.sync="design.tagForm.insert" />
+                        </el-tab-pane>
+                        <el-tab-pane label="修改表单选项" name="b">
+                          <de-form :form.sync="design.tagForm.update" />
+                        </el-tab-pane>
+                        <el-tab-pane label="表格选项" name="c">
+                          <de-table :table.sync="design.tagTable" />
+                        </el-tab-pane>
+                      </el-tabs>
                     </el-collapse-item>
-                    <el-collapse-item name="101">
-                      <template slot="title">
-                        <span style="color: #409eff">修改表单选项</span>
-                      </template>
-                      <de-form :form.sync="design.tagForm.update" />
-                    </el-collapse-item>
-                    <el-collapse-item name="103">
-                      <template slot="title">
-                        <span style="color: #409eff">表格选项</span>
-                      </template>
-                      <de-table :table.sync="design.tagTable" />
-                    </el-collapse-item>
-
                     <el-collapse-item name="200">
                       <template slot="title">
-                        <span style="color: #409eff">参数列表</span>
+                        <div style="width: 50%">
+                          <span style="color: #409eff">参数列表</span>
+                        </div>
+                        <el-link v-show="design.params.length === 0" type="primary" style="margin: auto 30px" @click="addParams($event, -1)">添加</el-link>
                       </template>
                       <el-collapse>
                         <div v-for="(p, pi) in design.params" :key="pi">
                           <el-collapse-item :name="pi">
                             <template slot="title">
-                              {{ pi + 1 }}
-                              <span style="color: #409eff; margin: auto 20px"> {{ p.title ? p.title + ' : ' + p.name : '未设置' }} </span>
+                              <div style="width: 50%">
+                                <span style="color: #409eff; margin: auto 20px"> {{ p.title ? p.title + ' : ' + p.name : '未设置' }} </span>
+                              </div>
+                              <el-link type="primary" style="margin: auto 30px" @click="delParams($event, pi)">删除</el-link>
+                              <el-link type="primary" @click="addParams($event, pi)">添加</el-link>
                             </template>
                             <el-card>
                               <div>
@@ -104,7 +108,7 @@ import ResultPreview from '@/components/ResultPreview.vue'
                                       <template slot="title">
                                         <span style="color: #409eff">元素</span>
                                       </template>
-                                      <de-form-element :insertForm.sync="p.updateForm" :name="p.name" />
+                                      <de-form-element :ref="'deFormElementUpdate_' + p.name" :insertForm.sync="p.updateForm" :name="p.name" />
                                     </el-collapse-item>
                                   </el-collapse>
                                 </template>
@@ -119,7 +123,7 @@ import ResultPreview from '@/components/ResultPreview.vue'
                                       <template slot="title">
                                         <span style="color: #409eff">表格列</span>
                                       </template>
-                                      <de-table :column.sync="p.table.tagTableColumn" />
+                                      <de-table-column :column.sync="p.table.tagTableColumn" />
                                     </el-collapse-item>
                                   </el-collapse>
                                 </template>
@@ -191,54 +195,7 @@ export default {
           attributes: [],
           events: []
         },
-        params: [
-          {
-            name: undefined,
-            title: undefined,
-            isKey: false,
-            insertForm: {
-              show: false,
-              itemType: undefined,
-              tagFormItem: {
-                name: undefined,
-                label: undefined,
-                attributes: [],
-                events: []
-              },
-              tagElement: {
-                name: undefined,
-                label: undefined,
-                attributes: [],
-                events: []
-              }
-            },
-            updateForm: {
-              show: false,
-              itemType: undefined,
-              tagFormItem: {
-                name: undefined,
-                label: undefined,
-                attributes: [],
-                events: []
-              },
-              tagElement: {
-                name: undefined,
-                label: undefined,
-                attributes: [],
-                events: []
-              }
-            },
-            table: {
-              show: false,
-              tagTableColumn: {
-                name: undefined,
-                label: undefined,
-                attributes: [],
-                events: []
-              }
-            }
-          }
-        ]
+        params: []
       },
       width: 12
     }
@@ -246,27 +203,72 @@ export default {
   methods: {
     handleIsKeyChange(val, par) {},
     handleShowInsertChange(val, par) {
-      console.debug(this.design)
+      // console.debug(this.design)
     },
     handleShowUpdateChange(val, par) {
       if (!val) {
         return
       }
-      if (par.showInsert && par.insertForm.itemType) {
-        console.log(par.insertForm)
-        const obj = JSON.stringify(par.insertForm)
-        const {
-          itemType,
-          component: { label, name, attributes, events }
-        } = JSON.parse(obj)
-        par.updateForm.itemType = itemType
-        par.updateForm.component.label = label
-        par.updateForm.component.name = name
-        par.updateForm.component.attributes = attributes
-        par.updateForm.component.events = events
+      if (par.insertForm.show && par.insertForm.itemType) {
+        const obj = JSON.parse(JSON.stringify(par.insertForm))
+        const { name } = par
+        setTimeout(() => {
+          this.$refs['deFormElementUpdate_' + name][0].handleInsertFormItemTypeChange(obj.itemType)
+          Object.assign(par.updateForm, obj)
+        }, 300)
       }
     },
-    handleShowTableChange(val, par) {}
+    handleShowTableChange(val, par) {},
+    delParams(event, index) {
+      this.design.params.splice(index, 1)
+    },
+    addParams(event, index) {
+      event.stopPropagation()
+      this.design.params.splice(index + 1, 0, {
+        name: undefined,
+        title: undefined,
+        isKey: false,
+        insertForm: {
+          show: false,
+          itemType: undefined,
+          tagFormItem: {
+            name: undefined,
+            label: undefined,
+            attributes: [],
+            events: []
+          },
+          tagElement: {
+            name: undefined,
+            label: undefined,
+            attributes: [],
+            events: []
+          }
+        },
+        updateForm: {
+          show: false,
+          itemType: undefined,
+          tagFormItem: {
+            name: undefined,
+            label: undefined,
+            attributes: [],
+            events: []
+          },
+          tagElement: {
+            name: undefined,
+            label: undefined,
+            attributes: [],
+            events: []
+          }
+        },
+        table: {
+          show: false,
+          tagTableColumn: {
+            attributes: [],
+            events: []
+          }
+        }
+      })
+    }
   }
 }
 </script>

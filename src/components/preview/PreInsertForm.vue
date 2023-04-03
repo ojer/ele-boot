@@ -1,10 +1,9 @@
 <script>
 export default {
   props: {
-    genData: Object,
-    limit: Number
+    genData: Object
   },
-  template: '<div>null</div>',
+  template: '<el-empty description=" "></el-empty>',
   data() {
     return {
       dialogFormVisible: true,
@@ -27,7 +26,7 @@ export default {
 
     // :rules="">
     this.genData.params.forEach(({ insertForm: { itemType, show, tagElement, tagFormItem }, name, title }) => {
-      if (show) {
+      if (show && itemType) {
         // form-item
         str += `<el-form-item label="${title}" prop="${name}"`
         str = this.setAttributes(tagFormItem.attributes, str)
@@ -60,7 +59,6 @@ export default {
     },
     // TODO
     setDataPar(obj, key) {
-      console.log('setD', key)
       var ks = key.split('.')
       var o = obj
       const kl = ks.length

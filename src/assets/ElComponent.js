@@ -23,7 +23,58 @@ export const eleFormComponent = [
 export const eleTable = { name: 'Table 表格', value: 'Table' }
 export const eleTableColumn = { name: 'TableColumn 表格列', value: 'TableColumn' }
 
+export const setAttributes = (data, attributes) => {
+  let str = ''
+  attributes.forEach(({ name, type, value, default: defVal }) => {
+    if (value !== undefined && defVal !== value) {
+      str += ` `
+      switch (type) {
+        case 'Object':
+        case 'Array':
+          var o = JSON.parse(JSON.stringify(data))
+          setDataPar(o, value)
+          for (const k in o) {
+            data[k] = o[k]
+          }
+          // Object.assign(data, o)
+          str += `:${name}="$data.${value}"`
+          break
+        case 'String':
+          str += `:${name}="'${value}'"`
+          break
+        case 'Boolean':
+          str += `:${name}="${value}"`
+          break
+        case 'Number':
+          str += `:${name}="${value}"`
+          break
+        default:
+          str += `:${name}="${value}"`
+      }
+    }
+  })
+  return str
+}
+const setDataPar = (obj, key) => {
+  var ks = key.split('.')
+  var o = obj
+  const kl = ks.length
+  for (let i = 0; i < kl; i++) {
+    var k = ks[i]
+    var fo = o[k]
+    if (fo === undefined) {
+      if (i < kl - 1) {
+        o[k] = {}
+      } else {
+        o[k] = undefined
+      }
+    }
+    o = o[k]
+  }
+}
+
 console.log(ElementUI)
+
 export const ElComponent = class {
   constructor(val) {
     const component = ElementUI[val]

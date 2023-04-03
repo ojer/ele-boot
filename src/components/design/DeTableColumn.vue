@@ -8,8 +8,7 @@ import DeGeneral from './DeGeneral.vue'
 <script>
 export default {
   props: {
-    column: Object,
-    name: String
+    column: Object
   },
   data() {
     return {
@@ -17,7 +16,7 @@ export default {
     }
   },
   created() {
-    this.localColumn = new ElComponent(eleTableColumn.value)
+    Object.assign(this.localColumn, new ElComponent(eleTableColumn.value))
   }
 }
 </script>
