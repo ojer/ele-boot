@@ -1,4 +1,5 @@
 <script>
+import { setAttributes } from '@/assets/ElComponent.js'
 export default {
   props: {
     genData: Object
@@ -16,35 +17,29 @@ export default {
     if (!this.genData.params || this.genData.params.length === 0) {
       return
     }
-    let str = '<el-card>'
+    const eles = []
+    eles.push('<el-card>')
     // :model="form"
-    str += '<el-form ref="dynamicValidateForm" '
     // <el-form>
-    const tagForm = this.genData.tagForm
-    str = this.setAttributes(tagForm.insert.attributes, str)
-    str += '>'
+    eles.push('  <el-form ref="dynamicValidateForm" ' + setAttributes(this.$data, this.genData.tagForm.insert.attributes) + '>')
 
     // :rules="">
     this.genData.params.forEach(({ insertForm: { itemType, show, tagElement, tagFormItem }, name, title }) => {
       if (show && itemType) {
         // form-item
-        str += `<el-form-item label="${title}" prop="${name}"`
-        str = this.setAttributes(tagFormItem.attributes, str)
-        str += `>`
+        eles.push(`    <el-form-item label="${title}" prop="${name}"` + setAttributes(this.$data, tagFormItem.attributes) + `>`)
         // el-xxx
         const tag = this.styleHyphenFormat(itemType)
-        str += `<el${tag} v-model="form.${name}"`
-        str = this.setAttributes(tagElement.attributes, str)
-        str += `></el${tag}>`
-        str += `</el-form-item>`
+        eles.push(`      <el${tag} v-model="form.${name}"` + setAttributes(this.$data, tagElement.attributes) + `></el${tag}>`)
+        eles.push(`    </el-form-item>`)
       }
     })
-    str += `<el-button size="mini" @click="handleInsertFormHide('dynamicValidateForm')">取 消</el-button>`
-    str += `<el-button type="primary" size="mini" @click="handleFormSubmit('dynamicValidateForm')">确 定</el-button>`
-    str += `</el-form>`
-    str += `</el-card>`
-    console.log(str)
-    this.$options.template = str
+    eles.push(`    <el-button size="mini" @click="handleInsertFormHide('dynamicValidateForm')">取 消</el-button>`)
+    eles.push(`    <el-button type="primary" size="mini" @click="handleFormSubmit('dynamicValidateForm')">确 定</el-button>`)
+    eles.push(`  </el-form>`)
+    eles.push(`</el-card>`)
+    this.$options.template = eles.join('\n')
+    console.log(this.$options.template)
   },
 
   methods: {
@@ -56,55 +51,6 @@ export default {
       return propertyName.replace(/[A-Z]/g, (match) => {
         return '-' + match.toLowerCase()
       })
-    },
-    // TODO
-    setDataPar(obj, key) {
-      var ks = key.split('.')
-      var o = obj
-      const kl = ks.length
-      for (let i = 0; i < kl; i++) {
-        var k = ks[i]
-        var fo = o[k]
-        if (fo === undefined) {
-          if (i < kl - 1) {
-            o[k] = {}
-          } else {
-            o[k] = undefined
-          }
-        }
-        o = o[k]
-      }
-    },
-    setAttributes(attributes, str) {
-      attributes.forEach(({ name, type, value, default: defVal }) => {
-        if (value !== undefined && defVal !== value) {
-          str += ` `
-          switch (type) {
-            case 'Object':
-            case 'Array':
-              var o = JSON.parse(JSON.stringify(this.$data))
-              this.setDataPar(o, value)
-              for (const k in o) {
-                this.$data[k] = o[k]
-              }
-              // Object.assign(this.$data, o)
-              str += `:${name}="$data.${value}"`
-              break
-            case 'String':
-              str += `:${name}="'${value}'"`
-              break
-            case 'Boolean':
-              str += `:${name}="${value}"`
-              break
-            case 'Number':
-              str += `:${name}="${value}"`
-              break
-            default:
-              str += `:${name}="${value}"`
-          }
-        }
-      })
-      return str
     }
   }
 }
