@@ -29,8 +29,58 @@ export default {
         // form-item
         eles.push(`    <el-form-item label="${title}" prop="${name}"` + setAttributes(this.$data, tagFormItem.attributes) + `>`)
         // el-xxx
+        // name: 'Radio 单选框', value: 'Radio' },
+        // name: 'RadioGroup 单选框组', value: 'RadioGroup' },
+        // name: 'Checkbox 多选框', value: 'Checkbox' },
+        // name: 'CheckboxGroup 多选框组', value: 'CheckboxGroup' },
+        // name: 'Input 输入框', value: 'Input' },
+        // name: 'InputNumber 计数器', value: 'InputNumber' },
+        // name: 'Select 选择器', value: 'Select' },
+        // name: 'Calendar 级联选择器', value: 'Calendar' },
+        // name: 'Switch 开关', value: 'Switch' },
+        // name: 'Slider 滑块', value: 'Slider' },
+        // name: 'TimePicker 时间选择器-任意时间点', value: 'TimePicker' },
+        // name: 'TimeSelect 时间选择器-固定时间点', value: 'TimeSelect' },
+        // name: 'DatePicker 日期选择器', value: 'DatePicker' },
+        // name: 'Upload 上传', value: 'Upload' }
         const tag = styleHyphenFormat(itemType)
-        eles.push(`      <el${tag} v-model="form.${name}"` + setAttributes(this.$data, tagElement.attributes) + `></el${tag}>`)
+        switch (itemType) {
+          case 'Radio':
+            break
+          case 'RadioGroup':
+            break
+          case 'Checkbox':
+            break
+          case 'CheckboxGroup':
+            break
+          case 'Input':
+            break
+          case 'InputNumber':
+            break
+          case 'Select':
+            eles.push(`      <el${tag} v-model="form.${name}"` + setAttributes(this.$data, tagElement.attributes) + `>`)
+            eles.push(`        <el-option v-for="item,index in options" :key="index" :label="item.label" :value="item.value">`)
+            eles.push(`        </el-option>`)
+            eles.push(`      </el${tag}>`)
+            break
+          case 'Calendar':
+            break
+          case 'Switch':
+            break
+          case 'Slider':
+            break
+          case 'TimePicker':
+            break
+          case 'TimeSelect':
+            break
+          case 'DatePicker':
+            break
+          case 'Upload':
+            break
+          default:
+            eles.push(`      <el${tag} v-model="form.${name}"` + setAttributes(this.$data, tagElement.attributes) + `></el${tag}>`)
+        }
+
         eles.push(`    </el-form-item>`)
       }
     })
