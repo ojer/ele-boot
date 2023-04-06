@@ -23,9 +23,16 @@ export const eleFormComponent = [
 export const eleTable = { name: 'Table 表格', value: 'Table' }
 export const eleTableColumn = { name: 'TableColumn 表格列', value: 'TableColumn' }
 
+export const styleHyphenFormat = (propertyName) => {
+  return propertyName.replace(/[A-Z]/g, (match) => {
+    return '-' + match.toLowerCase()
+  })
+}
+
 export const setAttributes = (data, attributes) => {
   let str = ''
   attributes.forEach(({ name, type, value, default: defVal }) => {
+    name = styleHyphenFormat(name)
     if (value !== undefined && defVal !== value) {
       str += ` `
       switch (type) {

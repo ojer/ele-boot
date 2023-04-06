@@ -15,13 +15,34 @@ import PreListTable from './preview/PreListTable.vue'
     </div>
     <el-tabs v-model="activeName" @tab-click="handClick">
       <el-tab-pane label="List" name="list">
-        <pre-list-table :genData="genData" :key="limit" />
+        <el-tabs value="pre" type="border-card">
+          <el-tab-pane label="Preview" name="pre">
+            <pre-list-table ref="preList" :genData="genData" @flushCode="flushCode" :key="limit" />
+          </el-tab-pane>
+          <el-tab-pane label="Code" name="cod">
+            <el-input v-model="code.list" type="textarea" autosize class="code-pre-textarea"></el-input>
+          </el-tab-pane>
+        </el-tabs>
       </el-tab-pane>
       <el-tab-pane label="Insert" name="insert">
-        <pre-insert-form :genData="genData" :key="limit" />
+        <el-tabs value="pre" type="border-card">
+          <el-tab-pane label="Preview" name="pre">
+            <pre-insert-form :genData="genData" :key="limit" @flushCode="flushCode" />
+          </el-tab-pane>
+          <el-tab-pane label="Code" name="cod">
+            <el-input v-model="code.insert" type="textarea" autosize class="code-pre-textarea"></el-input>
+          </el-tab-pane>
+        </el-tabs>
       </el-tab-pane>
       <el-tab-pane label="Update" name="updateForm">
-        <pre-insert-form :genData="genData" :key="limit" />
+        <el-tabs value="pre" type="border-card">
+          <el-tab-pane label="Preview" name="pre">
+            <pre-insert-form :genData="genData" :key="limit" @flushCode="flushCode" />
+          </el-tab-pane>
+          <el-tab-pane label="Code" name="cod">
+            <el-input v-model="code.insert" type="textarea" autosize class="code-pre-textarea"></el-input>
+          </el-tab-pane>
+        </el-tabs>
       </el-tab-pane>
     </el-tabs>
   </el-card>
@@ -35,7 +56,12 @@ export default {
     return {
       activeName: 'list',
       limit: 0.1,
-      genData: this.entity
+      genData: this.entity,
+      code: {
+        list: '',
+        insert: '',
+        update: ''
+      }
     }
   },
   computed: {},
@@ -49,7 +75,16 @@ export default {
         return
       }
       this.limit += 0.00001
+    },
+    flushCode(val) {
+      Object.assign(this.code, val)
     }
   }
 }
 </script>
+<style>
+.code-pre-textarea > .el-textarea__inner {
+  background: #4d4d4d;
+  color: #fff;
+}
+</style>

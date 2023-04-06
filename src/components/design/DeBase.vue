@@ -23,11 +23,8 @@ import ResultPreview from '@/components/ResultPreview.vue'
                   <span>design</span>
                 </div>
                 <el-form ref="design" :model="design" :size="'mini'" :label-width="'150px'">
-                  <el-collapse>
-                    <el-collapse-item name="100">
-                      <template slot="title">
-                        <span style="color: #409eff">组件配置</span>
-                      </template>
+                  <el-tabs value="ic">
+                    <el-tab-pane label="组件配置" name="ic">
                       <el-tabs value="a">
                         <el-tab-pane label="新增表单选项" name="a">
                           <de-form :form.sync="design.tagForm.insert" />
@@ -39,65 +36,58 @@ import ResultPreview from '@/components/ResultPreview.vue'
                           <de-table :table.sync="design.tagTable" />
                         </el-tab-pane>
                       </el-tabs>
-                    </el-collapse-item>
-                    <el-collapse-item name="200">
-                      <template slot="title">
-                        <div style="width: 50%">
-                          <span style="color: #409eff">参数列表</span>
-                        </div>
-                        <el-link v-show="design.params.length === 0" type="primary" style="margin: auto 30px" @click="addParams($event, -1)">添加</el-link>
-                      </template>
-                      <el-collapse>
-                        <div v-for="(p, pi) in design.params" :key="pi">
-                          <el-collapse-item :name="pi">
-                            <template slot="title">
-                              <div style="width: 50%">
-                                <span style="color: #409eff; margin: auto 20px"> {{ p.title ? p.title + ' : ' + p.name : '未设置' }} </span>
-                              </div>
-                              <el-link type="primary" style="margin: auto 30px" @click="delParams($event, pi)">删除</el-link>
-                              <el-link type="primary" @click="addParams($event, pi)">添加</el-link>
-                            </template>
-                            <el-card>
-                              <div>
-                                <template>
-                                  <el-form-item :label="'Title'">
-                                    <el-input v-model="p.title"></el-input>
-                                  </el-form-item>
-                                  <el-form-item label="name">
-                                    <el-input v-model="p.name"></el-input>
-                                  </el-form-item>
-                                  <el-form-item label="主键">
-                                    <el-switch v-model="p.isKey" :disabled="!p.name" @change="(val) => handleIsKeyChange(val, p)"> </el-switch>
-                                  </el-form-item>
-                                </template>
-                                <el-divider content-position="left">新增时</el-divider>
-                                <template>
-                                  <el-form-item label="新增时显示">
-                                    <el-switch v-model="p.insertForm.show" :disabled="!p.name || !p.title" @change="(val) => handleShowInsertChange(val, p)"> </el-switch>
-                                  </el-form-item>
-                                  <el-collapse v-if="p.insertForm.show" style="width: calc(100% - 150px); margin-left: 150px">
-                                    <el-collapse-item name="0">
-                                      <template slot="title">
-                                        <span style="color: #409eff">表单项目</span>
-                                      </template>
-                                      <de-form-item :formItem.sync="p.insertForm.tagFormItem" :name="p.name" :title="p.title" />
-                                    </el-collapse-item>
-                                    <el-collapse-item name="1">
-                                      <template slot="title">
-                                        <span style="color: #409eff">元素</span>
-                                      </template>
-                                      <de-form-element :insertForm.sync="p.insertForm" :name="p.name" />
-                                    </el-collapse-item>
-                                  </el-collapse>
-                                </template>
-
-                                <el-divider content-position="left">修改时</el-divider>
+                    </el-tab-pane>
+                    <el-tab-pane label="参数列表" name="ip">
+                      <el-button v-show="design.params.length === 0" size="mini" type="primary" style="margin: 30px" @click="addParams(-1)">添加</el-button>
+                      <div v-for="(p, pi) in design.params" :key="pi">
+                        <el-card>
+                          <div slot="header">
+                            <el-row>
+                              <el-col :span="8">
+                                <el-form-item label="Name" label-width="60px" style="margin-bottom: 0">
+                                  <el-input v-model.trim="p.name"></el-input>
+                                </el-form-item>
+                              </el-col>
+                              <el-col :span="8">
+                                <el-form-item label="Title" label-width="60px" style="margin-bottom: 0">
+                                  <el-input v-model.trim="p.title"></el-input>
+                                </el-form-item>
+                              </el-col>
+                              <el-col :span="4">
+                                <el-form-item label="主键" label-width="60px" style="margin-bottom: 0">
+                                  <el-switch v-model="p.isKey" :disabled="!p.name" @change="(val) => handleIsKeyChange(val, p)"> </el-switch>
+                                </el-form-item>
+                              </el-col>
+                              <el-col :span="4" style="text-align: right">
+                                <el-popconfirm title="确定删除" @confirm="delParams(pi)">
+                                  <el-link type="primary" slot="reference">删除</el-link>
+                                </el-popconfirm>
+                                <el-link type="primary" style="margin-left: 30px" @click="addParams(pi)">添加</el-link>
+                              </el-col>
+                            </el-row>
+                          </div>
+                          <el-card>
+                            <el-tabs value="onIns">
+                              <el-tab-pane label="新增时" name="onIns">
+                                <el-form-item label="新增时显示">
+                                  <el-switch v-model="p.insertForm.show" :disabled="!p.name || !p.title" @change="(val) => handleShowInsertChange(val, p)"> </el-switch>
+                                </el-form-item>
+                                <el-tabs v-if="p.insertForm.show" value="ele">
+                                  <el-tab-pane label="表单项目" name="ite">
+                                    <de-form-item :formItem.sync="p.insertForm.tagFormItem" :name="p.name" :title="p.title" />
+                                  </el-tab-pane>
+                                  <el-tab-pane label="元素" name="ele">
+                                    <de-form-element :insertForm.sync="p.insertForm" :name="p.name" />
+                                  </el-tab-pane>
+                                </el-tabs>
+                              </el-tab-pane>
+                              <el-tab-pane label="修改时" name="onUpd">
                                 <template>
                                   <el-form-item label="修改时可编辑">
                                     <el-switch v-model="p.updateForm.show" :disabled="!p.name || !p.title" @change="(val) => handleShowUpdateChange(val, p)"> </el-switch>
                                   </el-form-item>
 
-                                  <el-collapse v-if="p.updateForm.show" style="width: calc(100% - 150px); margin-left: 150px">
+                                  <el-collapse v-if="p.updateForm.show">
                                     <el-collapse-item name="0">
                                       <template slot="title">
                                         <span style="color: #409eff">表单项目</span>
@@ -112,28 +102,26 @@ import ResultPreview from '@/components/ResultPreview.vue'
                                     </el-collapse-item>
                                   </el-collapse>
                                 </template>
-
-                                <el-divider content-position="left">列表表格</el-divider>
-                                <template>
-                                  <el-form-item label="Table 显示列">
-                                    <el-switch v-model="p.table.show" :disabled="!p.name || !p.title" @change="(val) => handleShowTableChange(val, p)"> </el-switch>
-                                  </el-form-item>
-                                  <el-collapse v-if="p.table.show" style="width: calc(100% - 150px); margin-left: 150px">
-                                    <el-collapse-item name="0">
-                                      <template slot="title">
-                                        <span style="color: #409eff">表格列</span>
-                                      </template>
-                                      <de-table-column :column.sync="p.table.tagTableColumn" />
-                                    </el-collapse-item>
-                                  </el-collapse>
-                                </template>
-                              </div>
-                            </el-card>
-                          </el-collapse-item>
-                        </div>
-                      </el-collapse>
-                    </el-collapse-item>
-                  </el-collapse>
+                              </el-tab-pane>
+                              <el-tab-pane label="列表表格" name="oLis">
+                                <el-form-item label="Table 显示列">
+                                  <el-switch v-model="p.table.show" :disabled="!p.name || !p.title" @change="(val) => handleShowTableChange(val, p)"> </el-switch>
+                                </el-form-item>
+                                <el-collapse v-if="p.table.show">
+                                  <el-collapse-item name="0">
+                                    <template slot="title">
+                                      <span style="color: #409eff">表格列</span>
+                                    </template>
+                                    <de-table-column :column.sync="p.table.tagTableColumn" />
+                                  </el-collapse-item>
+                                </el-collapse>
+                              </el-tab-pane>
+                            </el-tabs>
+                          </el-card>
+                        </el-card>
+                      </div>
+                    </el-tab-pane>
+                  </el-tabs>
                 </el-form>
               </el-card>
             </el-main>
@@ -219,14 +207,14 @@ export default {
       }
     },
     handleShowTableChange(val, par) {},
-    delParams(event, index) {
+    delParams(index) {
       this.design.params.splice(index, 1)
     },
-    addParams(event, index) {
-      event.stopPropagation()
+    addParams(index) {
+      //  event.stopPropagation()
       this.design.params.splice(index + 1, 0, {
-        name: undefined,
-        title: undefined,
+        name: `par-${index + 1}`,
+        title: `tit-${index + 1}`,
         isKey: false,
         insertForm: {
           show: false,

@@ -1,5 +1,5 @@
 <template>
-  <el-card style="padding: 20px 100px">
+  <el-card style="padding: 20px">
     <div>
       <el-form-item label="表单组件">
         <el-select v-model="form.itemType" placeholder="选择" style="width: 100%" @change="(val) => handleInsertFormItemTypeChange(val)">
