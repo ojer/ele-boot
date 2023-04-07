@@ -8,7 +8,29 @@ export default {
   data() {
     return {
       dialogFormVisible: true,
-      form: {}
+      form: {},
+      options: [
+        {
+          label: 'lab1',
+          value: 'val1'
+        },
+        {
+          label: 'lab2',
+          value: 'val2'
+        },
+        {
+          label: 'lab3',
+          value: 'val3'
+        },
+        {
+          label: 'lab4',
+          value: 'val4'
+        },
+        {
+          label: 'lab5',
+          value: 'val5'
+        }
+      ]
     }
   },
   mounted() {},
@@ -48,10 +70,20 @@ export default {
           case 'Radio':
             break
           case 'RadioGroup':
+            eles.push(`      <el${tag} v-model="form.${name}"` + setAttributes(this.$data, tagElement.attributes) + `>`)
+            eles.push(`        <el-radio v-for="(item,index) in options" :key="index" :label="item.label">`)
+            eles.push(`        {{ item.value }}`)
+            eles.push(`        </el-radio>`)
+            eles.push(`      </el${tag}>`)
             break
           case 'Checkbox':
             break
           case 'CheckboxGroup':
+            eles.push(`      <el${tag} v-model="form.${name}"` + setAttributes(this.$data, tagElement.attributes) + `>`)
+            eles.push(`        <el-checkbox v-for="item,index in options" :key="index" :label="item.label">`)
+            eles.push(`        {{ item.value }}`)
+            eles.push(`        </el-checkbox>`)
+            eles.push(`      </el${tag}>`)
             break
           case 'Input':
             break

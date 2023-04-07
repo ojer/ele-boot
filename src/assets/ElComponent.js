@@ -80,8 +80,6 @@ const setDataPar = (obj, key) => {
   }
 }
 
-console.log(ElementUI)
-
 export const ElComponent = class {
   constructor(val) {
     const component = ElementUI[val]
@@ -103,19 +101,29 @@ export const ElComponent = class {
       if (defaultVal !== undefined && type !== 'Boolean') {
         defaultVal = defaultVal.toString()
       }
-      attributes.push({
+      const attribute = {
         name: key,
         type: type,
         default: defaultVal,
         value: defaultVal
         // description: '?',
-      })
+      }
+      if (1) {
+        presets(val, attribute)
+      }
+      attributes.push(attribute)
     }
 
     this.attributes = attributes
     //    this.name = name
     // this.label = label
     // this.events = events
+  }
+}
+const presets = (val, attribute) => {
+  switch (val) {
+    case '':
+      break
   }
 }
 
@@ -193,4 +201,3 @@ const otherComponent = [
   'Transfer',
   'Tree'
 ]
-console.log('otherComponent', otherComponent)
